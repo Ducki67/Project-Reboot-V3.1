@@ -1,3 +1,30 @@
+# Reboot (V3.1)
+V3.1 is a fork of the original reboot game server
+
+
+<details>
+
+<summary>Builds test list</summary>
+
+
+later on
+  
+</details>
+
+### Goals / Roadmap 
+- Stability on <s3 and <s19
+- More supportive gameplay on s20+
+- Game fixes
+- Custom commands
+- ItemGranter9000 (easy item granter)
+- GUI re-design
+- more ig
+
+
+
+<details>
+<summary>About Reboot (original)</summary>
+
 ## IMPORTANT: discord.gg/reboot is NOT us anymore!
 ![image](https://github.com/user-attachments/assets/5704e635-31d9-417a-856f-91728f2be7f2)
 
@@ -35,3 +62,6 @@ This project is licensed under the BSD-3-Clause license.
 ---
 
 **Note**: Project Reboot is a work in progress, and further updates and enhancements are planned. Explore, experiment, and contribute to make it even better! 🚀
+
+
+</details>
