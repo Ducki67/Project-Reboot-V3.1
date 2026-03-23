@@ -1274,8 +1274,8 @@ void AFortGameModeAthena::Athena_ReadyToEndMatchHook(AFortGameModeAthena* GameMo
 
 	// Revive DBNO players on match end (simple implementation)
 	int World_NetDriverOffset = -1;
-	World_NetDriverOffset = GameMode->GetWorld()->GetOffset("NetDriver");
-	auto WorldNetDriver = GameMode->GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+	World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+	auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
 
 	if (!WorldNetDriver)
 		return;
@@ -1323,7 +1323,7 @@ void AFortGameModeAthena::Athena_HandleStartingNewPlayerHook(AFortGameModeAthena
 	{
 		static int LastNum123 = 15;
 
-		if (GameMode->GetWorld()->GetNetDriver()->GetClientConnections().Num() >= NumRequiredPlayersToStart && LastNum123 != Globals::AmountOfListens)
+		if (GetWorld()->GetNetDriver()->GetClientConnections().Num() >= NumRequiredPlayersToStart && LastNum123 != Globals::AmountOfListens)
 		{
 			LastNum123 = Globals::AmountOfListens;
 

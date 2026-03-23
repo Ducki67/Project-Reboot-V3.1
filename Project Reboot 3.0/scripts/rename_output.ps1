@@ -48,14 +48,18 @@ $dir = Split-Path $InputPath -Parent
 $ext = [IO.Path]::GetExtension($InputPath)
 
 # Determine new name per rules
+# Prefer ABOVE_S20 to signal S20+ builds. CLIENT_ONLY indicates a client build name.
 if ($Above -and $ClientOnly) {
-    $newName = "Reboot S20+ Client$ext"
+    # Both flags: produce the S20+ Client name (explicit short form)
+    $newName = "S20+ Client$ext"
 }
 elseif ($Above) {
-    $newName = "Reboot Client$ext"
+    # ABOVE_S20 only: produce the S20+ build name (user requested lowercase 'reboot')
+    $newName = "reboot S20+$ext"
 }
 elseif ($ClientOnly) {
-    $newName = "Reboot S20+$ext"
+    # CLIENT_ONLY only: regular reboot client name
+    $newName = "Reboot Client$ext"
 }
 else {
     Write-Host "No flags set; leaving output as-is." -ForegroundColor Green

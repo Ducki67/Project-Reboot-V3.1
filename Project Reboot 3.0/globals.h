@@ -8,7 +8,7 @@
 
 
 #define ABOVE_S20
-// #define CLIENT_ONLY // only console reboot
+#define CLIENT_ONLY // only console reboot
 
 namespace Globals
 {
