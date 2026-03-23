@@ -6,8 +6,6 @@
 #include <string>
 #include <curl/curl.h>
 
-#include "globals.h"
-
 class DiscordWebhook {
 public:
     // Parameters:
@@ -77,7 +75,7 @@ private:
 
 namespace Information
 {
-    static std::string UptimeWebHook = (Globals::Webhook); // lest goo nigga
+    static std::string UptimeWebHook = ("");
 }
 
 static DiscordWebhook UptimeWebHook(Information::UptimeWebHook.c_str());

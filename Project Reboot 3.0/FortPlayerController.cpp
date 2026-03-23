@@ -416,17 +416,6 @@ void AFortPlayerController::ServerExecuteInventoryItemHook(AFortPlayerController
 
 			BuildingTool->ProcessEvent(OnRep_DefaultMetadataFn, &OldMetadata);
 		}
-		// Pickaxe stutter: if configured, trigger a brief cancel of the building tool when equipping a pickaxe
-		if (Globals::bUsePickaxeStutter)
-		{
-			std::string Path = ItemDefinition->GetPathName();
-
-			if (Path.find("Pickaxe") != std::string::npos || Path.find("Harvest") != std::string::npos)
-			{
-				// Cause a small visual/animation stutter by cancelling building tool on the client
-				PlayerController->ClientForceCancelBuildingTool();
-			}
-		}
 	}
 }
 

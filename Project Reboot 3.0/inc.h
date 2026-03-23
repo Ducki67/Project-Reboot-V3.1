@@ -5,8 +5,6 @@
 #include <format>
 #include <string>
 
-#include "globals.h"
-
 typedef unsigned short uint16;
 typedef unsigned char uint8;
 typedef char int8;
@@ -25,7 +23,7 @@ extern inline int Fortnite_CL = 0;
 // #define PROD // this doesnt do anything besides remove processeventhook and some assert stuff
 // DEPRECATED ^^^ (see Globals::bDeveloperMode)
 
-
+// #define ABOVE_S20
 
 struct PlaceholderBitfield
 {

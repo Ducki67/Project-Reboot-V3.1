@@ -493,66 +493,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, std::wstring(PlayerNames.begin(), PlayerNames.end()).c_str());
 		}
-		// Reboot-Ultimate inspired commands
-		else if (Command == "toggleinfiniterender")
-		{
-			if (NumArgs < 1)
-			{
-				SendMessageToConsole(PlayerController, L"Usage: toggleinfiniterender <0|1|mode>");
-				return;
-			}
-
-			try {
-				int mode = std::stoi(Arguments[1]);
-				Globals::bInfiniteRender = (mode != 0);
-				Globals::InfiniteRenderMode = mode;
-				SendMessageToConsole(PlayerController, (L"Infinite render set to " + std::to_wstring(mode)).c_str());
-			} catch(...) {
-				SendMessageToConsole(PlayerController, L"Invalid mode");
-			}
-		}
-		else if (Command == "pickaxestutter")
-		{
-			if (Arguments.size() <= 1) { SendMessageToConsole(PlayerController, L"Usage: pickaxestutter <on|off>"); return; }
-			std::string a = Arguments[1];
-			std::transform(a.begin(), a.end(), a.begin(), ::tolower);
-			Globals::bUsePickaxeStutter = (a == "on" || a == "1" || a == "true");
-			SendMessageToConsole(PlayerController, Globals::bUsePickaxeStutter ? L"Pickaxe stutter ON" : L"Pickaxe stutter OFF");
-		}
-		else if (Command == "autobusstart")
-		{
-			if (Arguments.size() <= 1) { SendMessageToConsole(PlayerController, L"Usage: autobusstart <on|off>"); return; }
-			std::string a = Arguments[1]; std::transform(a.begin(), a.end(), a.begin(), ::tolower);
-			Globals::bAutoBusStart = (a == "on" || a == "1" || a == "true");
-			SendMessageToConsole(PlayerController, Globals::bAutoBusStart ? L"Auto bus start enabled" : L"Auto bus start disabled");
-		}
-		else if (Command == "bot")
-		{
-			if (Arguments.size() <= 1) { SendMessageToConsole(PlayerController, L"Usage: bot <setname|setpickaxe|health> [args]"); return; }
-			std::string sub = Arguments[1]; std::transform(sub.begin(), sub.end(), sub.begin(), ::tolower);
-			if (sub == "setname")
-			{
-				if (Arguments.size() <= 2) { SendMessageToConsole(PlayerController, L"Provide a name"); return; }
-				Globals::BotName = Arguments[2];
-				SendMessageToConsole(PlayerController, L"Bot name set");
-			}
-			else if (sub == "setpickaxe")
-			{
-				if (Arguments.size() <= 2) { SendMessageToConsole(PlayerController, L"Provide a pickaxe WID"); return; }
-				Globals::BotPickaxeID = Arguments[2];
-				SendMessageToConsole(PlayerController, L"Bot pickaxe set");
-			}
-			else if (sub == "health")
-			{
-				if (Arguments.size() <= 2) { SendMessageToConsole(PlayerController, L"Provide health value"); return; }
-				try { Globals::bBotHealth = std::stoi(Arguments[2]); } catch(...) { }
-				SendMessageToConsole(PlayerController, L"Bot health updated");
-			}
-			else
-			{
-				SendMessageToConsole(PlayerController, L"Unknown bot subcommand");
-			}
-		}
 		else if (Command == "launch")
 		{
 			if (Arguments.size() <= 3)

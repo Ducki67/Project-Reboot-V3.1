@@ -901,7 +901,7 @@ bool ReplicateActorHook(UActorChannel* Channel)
     return ReplicateActorOriginal(Channel);
 }
 
-
+// #define CLIENT_ONLY // only console reboot
 
 DWORD WINAPI Main(LPVOID)
 {
@@ -1301,10 +1301,6 @@ DWORD WINAPI Main(LPVOID)
 
     Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameMode.ReadyToStartMatch"), AFortGameModeAthena::Athena_ReadyToStartMatchHook,
        (PVOID*)&AFortGameModeAthena::Athena_ReadyToStartMatchOriginal, false, false, true);
-
-     // Hook ReadyToEndMatch to optionally revive DBNO players on match end
-     Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortGameModeAthena.ReadyToEndMatch"), AFortGameModeAthena::Athena_ReadyToEndMatchHook,
-         (PVOID*)&AFortGameModeAthena::Athena_ReadyToEndMatchOriginal, false, false, true);
 
     if (Fortnite_Version > 3.3) // 0xE9 on 3.3 (assumed every build below)
     {
