@@ -6,6 +6,23 @@ V3.1 is a fork of the original reboot game server
 
 <summary>Builds test list</summary>
 
+min season 20+ support
+23.10 (not yet)
+23.50 (not yet)
+
+mdeium season 20+ support
+24.20 (not yet)
+25.20 (not yet)
+
+high season 20+ support
+26.30
+27.11
+
+very high season 20+ support
+28.30
+29.00
+29.40
+30.00
 
 later on
   

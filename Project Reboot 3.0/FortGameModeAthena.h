@@ -244,6 +244,8 @@ public:
 	static inline void (*Athena_HandleStartingNewPlayerOriginal)(AFortGameModeAthena* GameMode, AActor* NewPlayer);
 	static inline void (*SetZoneToIndexOriginal)(AFortGameModeAthena* GameModeAthena, int OverridePhaseMaybeIDFK);
 	static inline void (*OnAircraftEnteredDropZoneOriginal)(AFortGameModeAthena* GameModeAthena, AActor* Aircraft);
+	static inline void (*Athena_ReadyToEndMatchOriginal)(AFortGameModeAthena* GameMode);
+	static void Athena_ReadyToEndMatchHook(AFortGameModeAthena* GameMode);
 
 	AFortSafeZoneIndicator*& GetSafeZoneIndicator()
 	{

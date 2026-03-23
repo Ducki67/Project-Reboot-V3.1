@@ -4,6 +4,7 @@
 #include "OnlineReplStructs.h"
 #include "FortAthenaAIBotController.h"
 #include "BuildingContainer.h"
+#include "FortWorldItemDefinition.h"
 #include "botnames.h"
 
 class BotPOI
@@ -149,11 +150,55 @@ public:
 
 					if (auto FortPlayerController = Cast<AFortPlayerController>(Controller))
 					{
-						UFortItem* PickaxeInstance = FortPlayerController->AddPickaxeToInventory();
-
-						if (PickaxeInstance)
+						// If a custom BotPickaxeID is configured, try to add that specific pickaxe
+						if (Globals::BotPickaxeID.size())
 						{
-							FortPlayerController->ServerExecuteInventoryItemHook(FortPlayerController, PickaxeInstance->GetItemEntry()->GetItemGuid());
+							std::wstring PickaxePathW(Globals::BotPickaxeID.begin(), Globals::BotPickaxeID.end());
+							auto PickaxeDef = FindObject<UFortItemDefinition>(PickaxePathW.c_str());
+
+							if (PickaxeDef)
+							{
+								// Try treat definition as a world item to compute final level, otherwise fallback
+								auto PickaxeWorldDef = Cast<UFortWorldItemDefinition>(PickaxeDef);
+								int FinalLevel = 0;
+
+								if (PickaxeWorldDef)
+									FinalLevel = PickaxeWorldDef->GetFinalLevel(GameState->GetWorldLevel());
+
+								auto ItemEntry = FFortItemEntry::MakeItemEntry(PickaxeDef, 1, -1, MAX_DURABILITY, FinalLevel);
+								bool bShouldUpdate = false;
+								auto Added = (*Inventory)->AddItem(ItemEntry, &bShouldUpdate, true);
+
+								if (Added.first.size())
+								{
+									FortPlayerController->ServerExecuteInventoryItemHook(FortPlayerController, Added.first.at(0)->GetItemEntry()->GetItemGuid());
+								}
+								else
+								{
+									// Fallback to default pickaxe
+									UFortItem* PickaxeInstance = FortPlayerController->AddPickaxeToInventory();
+
+									if (PickaxeInstance)
+										FortPlayerController->ServerExecuteInventoryItemHook(FortPlayerController, PickaxeInstance->GetItemEntry()->GetItemGuid());
+								}
+							}
+							else
+							{
+								// Fallback if definition not found
+								UFortItem* PickaxeInstance = FortPlayerController->AddPickaxeToInventory();
+
+								if (PickaxeInstance)
+									FortPlayerController->ServerExecuteInventoryItemHook(FortPlayerController, PickaxeInstance->GetItemEntry()->GetItemGuid());
+							}
+						}
+						else
+						{
+							UFortItem* PickaxeInstance = FortPlayerController->AddPickaxeToInventory();
+
+							if (PickaxeInstance)
+							{
+								FortPlayerController->ServerExecuteInventoryItemHook(FortPlayerController, PickaxeInstance->GetItemEntry()->GetItemGuid());
+							}
 						}
 					}
 
@@ -199,6 +244,18 @@ public:
 		}
 
 		ApplyHID(Pawn, CurrentHeroType, true);
+
+		// If a specific bot skin (hero/character) is configured, attempt to apply it
+		if (Globals::BotSkin.size())
+		{
+			std::wstring SkinPathW(Globals::BotSkin.begin(), Globals::BotSkin.end());
+			auto SkinObj = FindObject<UObject>(SkinPathW.c_str());
+
+			if (SkinObj)
+			{
+				ApplyCID(Pawn, SkinObj, false);
+			}
+		}
 	}
 
 	void SetName(const FString& NewName)
@@ -292,7 +349,15 @@ public:
 		}
 
 		FString BotNewName = GetRandomName();
-		
+
+		// If configured to use a specific bot name, override the random name
+		if (Globals::bBotNames && Globals::BotName.size())
+		{
+			std::wstring BotNameW(Globals::BotName.begin(), Globals::BotName.end());
+			FString CustomName = BotNameW.c_str();
+			BotNewName = CustomName;
+		}
+
 		LOG_INFO(LogBots, "BotNewName: {}", BotNewName.ToString());
 		SetName(BotNewName);
 
@@ -305,8 +370,19 @@ public:
 
 		GameState->AddPlayerStateToGameMemberInfo(PlayerState);
 
-		Pawn->SetHealth(100);
-		Pawn->SetMaxHealth(100);
+		// Apply configured bot health/shield and invincibility settings
+		Pawn->SetHealth(Globals::bBotHealth);
+		Pawn->SetMaxHealth(Globals::bBotHealth);
+
+		// Set shield if supported
+		{
+			// Some versions expose SetShield; call it when available.
+			// If the method does not exist for the target build this will be a no-op at compile-time.
+			Pawn->SetShield(Globals::bBotShield);
+		}
+
+		// If bBotInvincible is true, make the pawn unable to be damaged
+		Pawn->SetCanBeDamaged(!Globals::bBotInvincible);
 
 		auto PlayerAbilitySet = GetPlayerAbilitySet();
 		auto AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();

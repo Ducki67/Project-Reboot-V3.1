@@ -517,6 +517,15 @@
     <None Include="UnrealEngine.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <!-- After build: rename output DLL according to include\build_flags.h flags -->
+  <Target Name="RenameOutputBasedOnFlags" AfterTargets="Build">
+    <PropertyGroup>
+      <BuiltFile>$(OutDir)$(TargetFileName)</BuiltFile>
+      <HeaderFile>$(ProjectDir)globals.h</HeaderFile>
+      <ScriptFile>$(ProjectDir)scripts\rename_output.ps1</ScriptFile>
+    </PropertyGroup>
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(ScriptFile)&quot; -InputPath &quot;$(BuiltFile)&quot; -HeaderPath &quot;$(HeaderFile)&quot;" />
+  </Target>
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>

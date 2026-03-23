@@ -829,6 +829,29 @@ bool AFortGameModeAthena::Athena_ReadyToStartMatchHook(AFortGameModeAthena* Game
 		}
 
 		LOG_INFO(LogDev, "Initialized!");
+
+		// If infinite render is enabled, force all streaming levels to be loaded and visible
+		if (Globals::bInfiniteRender)
+		{
+			LOG_INFO(LogDev, "bInfiniteRender enabled: forcing streaming levels loaded and visible");
+			auto& StreamingLevels = GetWorld()->GetStreamingLevels();
+			static auto SetShouldBeLoadedFn = FindObject<UFunction>(L"/Script/Engine.LevelStreaming.SetShouldBeLoaded");
+			static auto SetShouldBeVisibleFn = FindObject<UFunction>(L"/Script/Engine.LevelStreaming.SetShouldBeVisible");
+
+			for (int i = 0; i < StreamingLevels.Num(); ++i)
+			{
+				auto Level = StreamingLevels.At(i);
+				if (!Level)
+					continue;
+
+				bool bTrue = true;
+				if (SetShouldBeLoadedFn)
+					Level->ProcessEvent(SetShouldBeLoadedFn, &bTrue);
+
+				if (SetShouldBeVisibleFn)
+					Level->ProcessEvent(SetShouldBeVisibleFn, &bTrue);
+			}
+		}
 	}
 
 	static auto TeamsOffset = GameState->GetOffset("Teams");
@@ -1242,6 +1265,48 @@ int AFortGameModeAthena::Athena_PickTeamHook(AFortGameModeAthena* GameMode, uint
 	return NextTeamIndex;
 }
 
+void AFortGameModeAthena::Athena_ReadyToEndMatchHook(AFortGameModeAthena* GameMode)
+{
+	LOG_INFO(LogDev, "Athena_ReadyToEndMatchHook!");
+
+	if (Athena_ReadyToEndMatchOriginal)
+		Athena_ReadyToEndMatchOriginal(GameMode);
+
+	// Revive DBNO players on match end (simple implementation)
+	int World_NetDriverOffset = -1;
+	World_NetDriverOffset = GameMode->GetWorld()->GetOffset("NetDriver");
+	auto WorldNetDriver = GameMode->GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+
+	if (!WorldNetDriver)
+		return;
+
+	// Get a copy of the client connections array to iterate safely
+	auto ClientConnections = WorldNetDriver->GetClientConnections();
+
+	for (int i = 0; i < ClientConnections.Num(); ++i)
+	{
+		auto Conn = ClientConnections.At(i);
+		if (!Conn)
+			continue;
+
+		int PlayerControllerOffset = Conn->GetOffset("PlayerController");
+		auto CurrentController = Cast<AFortPlayerControllerAthena>(Conn->Get(PlayerControllerOffset));
+
+		if (!CurrentController)
+			continue;
+
+		auto Pawn = Cast<AFortPlayerPawn>(CurrentController->GetPawn());
+
+		if (!Pawn)
+			continue;
+
+		if (Pawn->IsDBNO())
+		{
+			AFortPlayerPawn::ServerReviveFromDBNOHook(Pawn, CurrentController);
+		}
+	}
+}
+
 void AFortGameModeAthena::Athena_HandleStartingNewPlayerHook(AFortGameModeAthena* GameMode, AActor* NewPlayerActor)
 {
 	if (NewPlayerActor == GetLocalPlayerController()) // we dont really need this but it also functions as a nullptr check usually
@@ -1254,11 +1319,11 @@ void AFortGameModeAthena::Athena_HandleStartingNewPlayerHook(AFortGameModeAthena
 
 	LOG_INFO(LogPlayer, "HandleStartingNewPlayer!");
 
-	if (Globals::bAutoRestart)
+	if (Globals::bAutoBusStart)
 	{
 		static int LastNum123 = 15;
 
-		if (GetWorld()->GetNetDriver()->GetClientConnections().Num() >= NumRequiredPlayersToStart && LastNum123 != Globals::AmountOfListens)
+		if (GameMode->GetWorld()->GetNetDriver()->GetClientConnections().Num() >= NumRequiredPlayersToStart && LastNum123 != Globals::AmountOfListens)
 		{
 			LastNum123 = Globals::AmountOfListens;
 
