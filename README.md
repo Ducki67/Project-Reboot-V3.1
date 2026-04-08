@@ -1,5 +1,9 @@
-# Reboot (V3.1)
+# Reboot (V3.1)  (LATER / SOON)
 V3.1 is a fork of the original reboot game server
+
+
+**INFO**
+rn i cant focus on this cuz i have other thinsg to do but i will add some stuff to ir over time in my free time  Next update will prob be in Late April 2026
 
 
 <details>
